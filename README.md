@@ -1,5 +1,5 @@
 # wait-for-status-checks
-This GitHub Action waits for a specified GitHub Status Check to complete before continuing the workflow. It uses the GitHub Status API to check the status of the specified context on the head commit of the current branch. The action will poll the API until the status is either "success" or "failure", or until the specified timeout is reached.
+This GitHub Action waits for a specified GitHub Status Check to complete before continuing the workflow. It uses the GitHub Status API to check the status of the specified context on the head commit of the current branch. The action will poll the API until the status is either "success", "failure", "not found", or until the specified timeout is reached.
 
 ## Inputs
 
@@ -15,7 +15,7 @@ This GitHub Action waits for a specified GitHub Status Check to complete before 
 
 | Output | Description |
 |--------|-------------|
-| result | Failure or success result of the status |
+| result | `failure`, `success` or `not found` result of the status |
 
 ## Example Usage
 

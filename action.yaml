@@ -2,7 +2,7 @@
 name: "wait-for-status-checks"
 description: >-
   GitHub Action for wait for status API's result.
-  Pass or Fail based on allowed-conclusion.  
+  Pass or Fail based on allowed-conclusion.
 
 branding:
   icon: check-circle
@@ -35,11 +35,11 @@ outputs:
     value: ${{ steps.outcome.outputs.result }}
 
 runs:
-  using: composite 
+  using: composite
   steps:
-    - shell: bash 
+    - shell: bash
       run: |
-        export PYTHONPATH=${{ github.action_path }}:${{ github.action_path }}/vendor 
+        export PYTHONPATH=${{ github.action_path }}:${{ github.action_path }}/vendor
         python3 -m wait-for-status-checks \
           --ref="${{ inputs.ref }}" \
           --context="${{ inputs.context }}" \

@@ -1,13 +1,19 @@
 import argparse
-import os
-import requests
 import json
-import time
+import os
 import sys
+import time
 from pathlib import Path
+
+import requests
 
 outputs_path = Path(os.environ["GITHUB_OUTPUT"])
 summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])
+
+
+def make_api_call(endpoint):
+    write_to_summary(f"api call to {endpoint}")
+    return requests.get(api_endpoint)
 
 
 def str_to_int(value):
@@ -38,26 +44,27 @@ def set_gha_output(name, value):
 
 
 def get_status():
-    response = requests.get(api_endpoint)
+    response = make_api_call(api_endpoint)
     state = json.loads(response.text)[0]["state"]
     return state
 
 
 def get_context():
-    response = requests.get(api_endpoint)
+    response = make_api_call(api_endpoint)
     context = json.loads(response.text)[0]["context"]
     return context
 
 
 def main(arguments):
-    response = requests.get(api_endpoint)
+    response = make_api_call(api_endpoint)
     statuses_length = len(json.loads(response.text))
     if statuses_length == 0:
+        breakpoint()
         write_to_summary(
-            f"{arguments.context} failed to start! Stopping.", is_error=True
+            f"{arguments.context} failed to start or not triggered! Stopping.",
         )
-        set_gha_output("result", "failure")
-        sys.exit(1)
+        set_gha_output("result", "not found")
+        sys.exit(0)
     status = get_status()
     context = get_context()
     if context != arguments.context:
