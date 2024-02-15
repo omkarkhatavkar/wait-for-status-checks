@@ -58,7 +58,7 @@ def get_context():
 def main(arguments):
     response = make_api_call(api_endpoint)
     statuses_length = len(json.loads(response.text))
-    if statuses_length == 0:
+    if statuses_length == 0 or response.status_code == 404:
         write_to_summary(
             f"{arguments.context} failed to start or not triggered! Stopping."
         )
@@ -70,8 +70,8 @@ def main(arguments):
             write_to_summary(
                 f"{arguments.context} failed to start! Stopping.", is_error=True
             )
-            set_gha_output("result", "failure")
-            sys.exit(1)
+            set_gha_output("result", "not_found")
+            sys.exit(0)
         counter = 0
         write_to_summary(f"Waiting for {arguments.context} to complete...")
         while status != "success" and status != "failure":

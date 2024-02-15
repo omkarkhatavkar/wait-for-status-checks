@@ -31,13 +31,14 @@ inputs:
 
 outputs:
   result:
-    description: Failure or success result of the status
+    description: failure or success result of the status
     value: ${{ steps.outcome.outputs.result }}
 
 runs:
   using: composite
   steps:
-    - shell: bash
+    - id: outcome
+      shell: bash
       run: |
         export PYTHONPATH=${{ github.action_path }}:${{ github.action_path }}/vendor
         python3 -m wait-for-status-checks \
