@@ -40,7 +40,7 @@ def set_gha_output(name, value):
     * https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
     """
     with open(outputs_path, "a") as outputs_file:
-        print(f"{name}={value}", file=outputs_file, end="\n")
+        print(f"{name}={value}", file=outputs_file)
 
 
 def get_status():
@@ -59,40 +59,41 @@ def main(arguments):
     response = make_api_call(api_endpoint)
     statuses_length = len(json.loads(response.text))
     if statuses_length == 0:
-        breakpoint()
         write_to_summary(
-            f"{arguments.context} failed to start or not triggered! Stopping.",
+            f"{arguments.context} failed to start or not triggered! Stopping."
         )
-        set_gha_output("result", "not found")
-        sys.exit(0)
-    status = get_status()
-    context = get_context()
-    if context != arguments.context:
-        write_to_summary(
-            f"{arguments.context} failed to start! Stopping.", is_error=True
-        )
-        set_gha_output("result", "failure")
-        sys.exit(1)
-    counter = 0
-    write_to_summary(f"Waiting for {arguments.context} to complete...")
-    while status != "success" and status != "failure":
-        if counter > arguments.count:
-            write_to_summary(f"{arguments.context} Timeout! Stopping.", is_error=True)
+        set_gha_output("result", "not_found")
+    else:
+        status = get_status()
+        context = get_context()
+        if context != arguments.context:
+            write_to_summary(
+                f"{arguments.context} failed to start! Stopping.", is_error=True
+            )
             set_gha_output("result", "failure")
             sys.exit(1)
-        time.sleep(arguments.wait)
-        status = get_status()
-        write_to_summary(f"{arguments.context}: {status}")
-        counter += 1
+        counter = 0
+        write_to_summary(f"Waiting for {arguments.context} to complete...")
+        while status != "success" and status != "failure":
+            if counter > arguments.count:
+                write_to_summary(
+                    f"{arguments.context} Timeout! Stopping.", is_error=True
+                )
+                set_gha_output("result", "failure")
+                sys.exit(1)
+            time.sleep(arguments.wait)
+            status = get_status()
+            write_to_summary(f"{arguments.context}: {status}")
+            counter += 1
 
-    if status != "success":
-        write_to_summary(f"{arguments.context}: {status}")
-        write_to_summary("::error PRT failed", is_error=True)
-        set_gha_output("result", "failure")
-        sys.exit(1)
-    else:
-        write_to_summary(f"{arguments.context} Passed Successfully!")
-        set_gha_output("result", "success")
+        if status != "success":
+            write_to_summary(f"{arguments.context}: {status}")
+            write_to_summary("::error PRT failed", is_error=True)
+            set_gha_output("result", "failure")
+            sys.exit(1)
+        else:
+            write_to_summary(f"{arguments.context} Passed Successfully!")
+            set_gha_output("result", "success")
 
 
 if __name__ == "__main__":
