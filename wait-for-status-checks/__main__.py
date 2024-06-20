@@ -68,10 +68,10 @@ def main(arguments):
         context = get_context()
         if context != arguments.context:
             write_to_summary(
-                f"{arguments.context} failed to start! Stopping.", is_error=True
+                f"{arguments.context} failed to start! Stopping. Please re-trigger it", is_error=True
             )
             set_gha_output("result", "not_found")
-            sys.exit(0)
+            sys.exit(1)
         counter = 0
         write_to_summary(f"Waiting for {arguments.context} to complete...")
         while status != "success" and status != "failure":
